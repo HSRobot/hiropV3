@@ -5,8 +5,8 @@
 #include "configuer.h"
 #include "pickplace.h"
 #include "cpp_loader.h"
-#include "c_base_generator.h"
-#include "c_base_pickplace.h"
+#include "igenerator.h"
+#include "ipickplace.h"
 
 using std::string;
 using namespace std;
@@ -68,18 +68,6 @@ public:
     int setPlacePose(PoseStamped placePos);
 
     /**
-     * @brief 設置對象位置坐標
-     * @return 0,成功　-1．失败
-     */
-    int showObject(PoseStamped pose);
-
-    /**
-     * @brief 移除物体
-     * @return　0,成功　-1．失败
-     */
-    int removeObject();
-
-    /**
      * @brief 运动到点
      * @param pose　点位
      * @return
@@ -115,6 +103,17 @@ public:
      */
     int stop();
 
+
+
+    void setMoveGroup();
+
+    /****/
+    int updateGenerator(std::string path);
+    int updateActuator(std::string path);
+    void setVelocityAccelerated(double v, double a);
+    int groupConfig(std::string path);
+    /****/
+
 private:
 
     /**
@@ -146,6 +145,7 @@ private:
      * @return
      */
     int _gen_placePose(PoseStamped placePos);
+
 
 private:
     /**
@@ -189,7 +189,6 @@ private:
     map<string, IPickPlace*> pyActuator;
 
     bool stopFlag_;
-    PoseStamped objPos_;
 };
 }
 #endif // PICK_EXCUTE_H

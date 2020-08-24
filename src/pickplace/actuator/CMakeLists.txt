@@ -1,21 +1,24 @@
 ## 经典生成器
 FIND_PACKAGE(tf REQUIRED)
 
+SET(ROS_LIB_PATH /opt/ros/kinetic/lib)
+
+
 FIND_PACKAGE(REQUIRED COMPONENTS
   moveit_core
   moveit_ros_planning_interface
   moveit_ros_perception
+  moveit
+  moveit_msgs
 )
-
-SET(ROS_LIB_PATH /opt/ros/kinetic/lib)
 
 LINK_DIRECTORIES(${ROS_LIB_PATH})
 
-INCLUDE_DIRECTORIES(${tf_INCLUDE_DIRS} /usr/include/eigen3)
+INCLUDE_DIRECTORIES(${tf_INCLUDE_DIRS})
 
-ADD_LIBRARY(ClassicActuator classic_actuator.cpp)
+ADD_LIBRARY(Actuator adjuster.cpp classic_actuator.cpp )
 
-TARGET_LINK_LIBRARIES(ClassicActuator
+TARGET_LINK_LIBRARIES(Actuator
     tf
     moveit_planning_interface
     moveit_planning_scene_interface
@@ -23,9 +26,13 @@ TARGET_LINK_LIBRARIES(ClassicActuator
     moveit_collision_detection
     moveit_kinematic_constraints
     HPlugin
-    yaml-cpp)
+    yaml-cpp
+    moveit_trajectory_processing
+    )
 
-INSTALL(TARGETS ClassicActuator DESTINATION lib)
+
+
+INSTALL(TARGETS Actuator DESTINATION lib)
 
 ############################ Start Simaple Generator ############################
 

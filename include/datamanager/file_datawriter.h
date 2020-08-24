@@ -2,6 +2,7 @@
 
 #include "idatawirter.h"
 
+
 namespace hirop{
 
 namespace data_manager{
@@ -74,12 +75,52 @@ public:
 
     int listUri(DataUri &uri, std::vector<DataUri> &uris);
 
+    int setConfing(std::string RobotName, int DOF);
+    /**
+    * @brief addDataMulti 保存多个点位, 每次调用保存一个
+    * @param joint 关节弧度
+
+    * @return 0 成功 -1 失败
+    */
+    int addJointDataMulti(std::vector<double> joint);
+
+
+    /**
+     * @brief loadDataMulti 加载多个点位的结束标志函数
+     * @param uri 数据的URI
+     * @return 0 成功 -1 失败
+    */
+    std::vector<std::vector<double> > loadJointDataMulti(DataUri& uri);
+
+
+    int addPoseDataMulti(geometry_msgs::PoseStamped& pose);
+    std::vector<geometry_msgs::PoseStamped> loadPoseDataMulti(DataUri& uri);
+
+    /**
+     * @brief saveDataMultiEnd 保存多个点位的结束标志函数
+     * @param uri 数据的URI
+     * @return 0 成功 -1 失败
+    */
+    int saveDataMultiEnd(DataUri& uri);
+
+
+
 private:
+    void recordInit();
+    void delay_ms(int ms);
+    int addData(YAML::Node& node, std::vector<double> joint, int num);
+    int addData(YAML::Node& node, geometry_msgs::PoseStamped& pose, int num);
+    int getData(geometry_msgs::PoseStamped& pose, YAML::Node& config, int num);
     /**
      * @brief _basePath     搜索的根路径
      */
     std::string _basePath;
 
+    int cnt = 0;
+    std::string robotName = "co605";
+    int DOFNum = 6;
+    int time;
+    YAML::Node yamlNode;
 };
 
 }
