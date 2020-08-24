@@ -1,0 +1,29 @@
+#include "PclFilterManage.h"
+#include "voxelPclFilter.h"
+#include "pcl/point_cloud.h"
+#include "pcl/common/io.h"
+#include "pclFilterFactory.h"
+
+
+#include"log4cpp/Category.hh"
+#include"log4cpp/OstreamAppender.hh"
+#include"log4cpp/BasicLayout.hh"
+#include"log4cpp/Priority.hh"
+
+int main()
+{
+
+//    log4cpp::OstreamAppender* osAppender =new log4cpp::OstreamAppender("osAppender",&cout);
+//    osAppender->setLayout(new log4cpp::BasicLayout());
+//    log4cpp::Category& root = log4cpp::Category::getRoot();
+//    root.addAppender(osAppender);
+
+    PclFilterManager<pcl::PointXYZ> p;
+
+    boost::shared_ptr<PclFilterEntry<pcl::PointXYZ > > voxel(new voxelPclFilter<pcl::PointXYZ >("voxel"));
+
+    p.addFilterEntry(voxel);
+    int ret = p.filterProcess();
+    std::cout << "filterProcess: "<< ret<<std::endl;
+    return 0;
+}
