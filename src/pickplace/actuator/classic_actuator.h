@@ -23,16 +23,22 @@
 
 #include <utils/idebug.h>
 #include "pickplace/execute_process.h"
-#include "pickplace/c_base_pickplace.h"
 #include "hpluginloader.h"
 
-#define MOVE_GROUP "arm"
+/****/
+#include "adjuster.h"
+#include <moveit_msgs/PickupActionResult.h>
+#include <moveit_msgs/PlaceActionResult.h>
+#include "pickplace/ipickplace.h"
+#include "std_msgs/Bool.h"
+/****/
+
 #define OBJECT_ID "object"
 
 using namespace hirop_pickplace;
 using namespace moveit::planning_interface;
 
-class ClassicActuator:public CBasePickPlace{
+class Actuator:public IPickPlace{
     typedef struct Geometry{
         std::string type;
         double length;
@@ -46,10 +52,14 @@ class ClassicActuator:public CBasePickPlace{
     }Geometry;
 
     typedef struct MoveitConfig{
-        std::string planner_id;
-        double velocity;
-        double accelerated;
+        std::string name;
     }MoveitConfig;
+
+    typedef struct GripperConfig{
+        std::string name;
+        std::vector<double> openGripper;
+        std::vector<double> closeGripper;
+    }GripperConfig;
 
     typedef struct PickPlaceConfig
     {
@@ -72,13 +82,13 @@ class ClassicActuator:public CBasePickPlace{
         double back_vect_z;
     }PickConfig;
 
-    typedef struct GripperConfig{
-        std::string allowed_coliision;
-        std::string joint_name;
-        double open_position;
-        double close_position;
+    // typedef struct GripperConfig{
+    //     std::string allowed_coliision;
+    //     std::string joint_name;
+    //     double open_position;
+    //     double close_position;
 
-    }GripperConfig;
+    // }GripperConfig;
 
     typedef struct JointConstraints{
         std::vector<std::string> joint_name;
@@ -101,12 +111,12 @@ public:
     /**
      * @brief 构造函数
      */
-    ClassicActuator();
+    Actuator();
 
     /**
      * @brief 析构函数
      */
-    ~ClassicActuator();
+    ~Actuator();
 
     /**
      * @brief 传递私有参数
@@ -133,21 +143,6 @@ public:
      * -1,失败
      */
     int setPlacePose(PoseStamped placePos);
-
-    /**
-     * @brief 显示物体
-     * @param object_pose
-     * @return
-     */
-    int showObject(PoseStamped object_pose);
-
-    /**
-     * @brief 删除显示物体
-     * @return
-     * 0, 成功
-     * -1, 失败
-     */
-    int removeObject();
 
     /**
      * @brief 运动到点
@@ -180,6 +175,16 @@ public:
      * @return
      */
     int stopPickplace();
+
+    /****/
+    int updateParam(std::string path);
+    void setVelocityAccelerated(double v, double a);
+
+    int groupConfig(YAML::Node& );
+    
+    int getName(std::string &name) ;
+    ENTITY_TYPE getEntityType() ;
+    /****/
 
 private:
 
@@ -271,61 +276,49 @@ private:
     int makePlace();
 
     /**
-     * @brief addBaseTable 生成地板
-     * @return
-     */
-    int addBaseTable();
-
-    /**
-     * @brief addCollisionObject 配置场景物体
-     * @param object_id　物体id
-     * @return
-     */
-    int addCollisionObject(std::string object_id);
-
-    /**
-     * @brief addCollision 添加场景物体
-     * @return
-     */
-    int addCollision();
-
-    /**
-     * @brief removeCollision 移除场景物体
-     * @return
-     */
-    int removeCollision();
-
-    /**
-     * @brief attachCollision　绑定场景物体
-     * @param obj　物体ｉｄ
-     * @return
-     */
-    int attachCollision(std::string obj);
-
-    /**
-     * @brief dettachCollision 解绑场景物体
-     * @param obj　物体id
-     * @return
-     */
-    int dettachCollision(std::string obj);
-
-    /**
-     * @brief showObjectMash 加载ｍａｓｈ类型物体
-     * @param obj_path　物体路径
-     * @return
-     */
-    int showObjectMash(std::string obj_path);
-
-    /**
      * @brief makeGripperPosture 生成姿态
      * @param jiont_position
      * @return
      */
-    trajectory_msgs::JointTrajectory makeGripperPosture(double jiont_position);
+    trajectory_msgs::JointTrajectory makeGripperPosture(bool is_open);
 
     void jointConstraints(std::string jointName, double position, double above, double below,double weight);
 
+    /****/
+    void setMoveGroup();
+    bool pickExecute(std::vector<moveit_msgs::RobotTrajectory>& tra);
+    bool placeExecute(std::vector<moveit_msgs::RobotTrajectory>& tra);
+    bool execute(moveit_msgs::RobotTrajectory& tra);
+    void pickTraCB(const moveit_msgs::PickupActionResultConstPtr& msg);
+    void placeTraCB(const moveit_msgs::PlaceActionResultConstPtr& msg);
+    bool gripperController(bool open);
+    /****/
+
+
 private:
+    /****/
+    double velocity;
+    double accelerated;
+    std::string MOVE_GROUP;
+    std::string GRIPPER_GROUP;
+    std::vector<double> openGripper = {0, 0, 0, 0};
+    std::vector<double> closeGripper = {0.1, -0.1, 0.1, 0.1};
+    adjuster* adjusterPtr;
+    std::vector<moveit_msgs::RobotTrajectory> Picktraject;
+    std::vector<moveit_msgs::RobotTrajectory> gripperPicktraject;
+    bool receivePickTra = false;
+    std::vector<moveit_msgs::RobotTrajectory> Placetraject;
+    std::vector<moveit_msgs::RobotTrajectory> gripperPlacetraject;
+    bool receivePlaceTra = false;
+    ros::Subscriber pickTraSub;
+    ros::Subscriber placeTraSub;
+    ros::Publisher gripperPub;
+    ros::NodeHandle node;
+
+    std::string _name;
+    ENTITY_TYPE _entityType;
+    /****/
+
     Parameters m_parm;
     ros::NodeHandle npick;
     geometry_msgs::PoseStamped m_pickPose;
@@ -334,6 +327,7 @@ private:
     std::vector<moveit_msgs::PlaceLocation> _placeLocPoses;
     std::vector<moveit_msgs::CollisionObject> _collisionObjects;
     MoveGroupInterface *_moveGroup;
+    MoveGroupInterface *_gripperGroup;
     PlanningSceneInterface _planScene;
     tf2::Quaternion _orientation;
     std::vector<std::string> _objectIds;

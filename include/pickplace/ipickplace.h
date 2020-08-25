@@ -6,6 +6,9 @@
 #include "hplugin.h"
 #include "pickplace.h"
 
+// #include <yaml-cpp/yaml.h>
+
+
 using namespace hirop;
 
 namespace hirop_pickplace {
@@ -32,20 +35,6 @@ public:
      * @return 0，成功  -1，失败
      */
     virtual int setPlacePose(PoseStamped ) = 0;
-
-    /**
-     * @brief 显示物体
-     * @return 0，成功  -1，失败
-     */
-    virtual int showObject(PoseStamped) = 0;
-
-    /**
-     * @brief 删除显示物体
-     * @return
-     * 0,成功
-     * -1,失败
-     */
-    virtual int removeObject() = 0;
 
      /**
      * @brief 运动到点
@@ -79,11 +68,17 @@ public:
      */
     virtual int stopPickplace() = 0;
 
-    virtual int getName(std::string &name) = 0;
+    virtual void setMoveGroup() = 0;
 
     virtual ENTITY_TYPE getEntityType() = 0;
 
     virtual ~IPickPlace(){}
+
+    /****/
+    virtual int updateParam(std::string path) = 0;
+    virtual void setVelocityAccelerated(double v, double a) = 0;
+    virtual int groupConfig(YAML::Node& ) = 0;
+    /****/
 
 protected:
     // 保存器的字符描述

@@ -11,15 +11,15 @@ PickPlace::PickPlace()
 
 PickPlace::~PickPlace()
 {
-    cloaderPtr = NULL;
-    generatorPtr = NULL;
-    pickplacePtr = NULL;
-    configuerPtr = NULL;
-
     delete cloaderPtr;
     delete generatorPtr;
     delete pickplacePtr;
     delete configuerPtr;
+
+    cloaderPtr = NULL;
+    generatorPtr = NULL;
+    pickplacePtr = NULL;
+    configuerPtr = NULL;
 }
 
 int PickPlace::setGenerator(string generatorName, string entityType, std::string configFile)
@@ -58,7 +58,8 @@ int PickPlace::setActuator(string actuatorName, string entityType, std::string c
     if(cppActuator.count(actuatorName)){
         this->pickplacePtr = cppActuator.at(actuatorName);
     }
-    else {
+    else 
+    {
         this->pickplacePtr = cloaderPtr->loadPickPlace(actuatorName);
 
         if(this->pickplacePtr == NULL){
@@ -103,7 +104,6 @@ int PickPlace::setPickPose(PoseStamped pickPos)
         return -1;
     }
 
-    objPos_ = pickPos;
 
     this->generatorPtr->setPickPose(pickPos);
     if(this->generatorPtr->genPickPose() != 0){
@@ -121,27 +121,6 @@ int PickPlace::setPlacePose(PoseStamped placePos)
     if(this->generatorPtr->genPlacePose() != 0){
         return -1;
     }
-    return 0;
-}
-
-int PickPlace::showObject(PoseStamped objPose)
-{
-    if(this->pickplacePtr == NULL)
-        return -1;
-    if(objPose.pose.position.x == 0 && objPose.pose.position.y == 0 && objPose.pose.position.z == 0){
-        objPose = objPos_;
-    }
-    if(this->pickplacePtr->showObject(objPose))
-        return -1;
-    return 0;
-}
-
-int PickPlace::removeObject()
-{
-    if(this->pickplacePtr == NULL)
-        return -1;
-    if(this->pickplacePtr->removeObject())
-        return -1;
     return 0;
 }
 
@@ -180,7 +159,6 @@ int PickPlace::pick()
 {
     stopFlag_ = false;
     PoseStamped pickPoss;
-    removeObject();
     if(this->generatorPtr == NULL){
         IErrorPrint("generatorPtr: Null! ! !");
         return -1;
@@ -191,7 +169,6 @@ int PickPlace::pick()
     }
 
     this->generatorPtr->getResultPickPose(pickPoss);
-    showObject(objPos_);
 
     if(stopFlag_)
         return -1;
@@ -231,7 +208,6 @@ int PickPlace::place()
         IErrorPrint("place failed! ! !");
         return -1;
     }
-    removeObject();
     return 0;
 }
 
@@ -255,3 +231,39 @@ int PickPlace::stop()
     return 0;
 }
 
+void PickPlace::setMoveGroup()
+{
+    this->pickplacePtr->setMoveGroup();
+}
+
+/****/
+int PickPlace::updateGenerator(std::string path)
+{
+    this->generatorPtr->updateParam(path);
+    return 0;
+}
+
+int PickPlace::updateActuator(std::string path)
+{
+    this->pickplacePtr->updateParam(path);
+    return 0;
+}
+
+void PickPlace::setVelocityAccelerated(double v, double a)
+{
+    this->pickplacePtr->setVelocityAccelerated(v, a);
+}
+
+int PickPlace::groupConfig(std::string path)
+{
+    YAML::Node node;
+    node = YAML::LoadFile(path);
+    if(node.IsNull())
+    {
+        return -1;
+    }
+    this->pickplacePtr->groupConfig(node);
+    return 0;
+}
+
+/****/

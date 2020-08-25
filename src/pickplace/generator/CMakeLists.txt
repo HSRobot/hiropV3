@@ -4,11 +4,11 @@ INCLUDE_DIRECTORIES(${tf_INCLUDE_DIRS})
 SET(ROS_LIB_PATH /opt/ros/kinetic/lib)
 
 LINK_DIRECTORIES(${ROS_LIB_PATH})
-ADD_LIBRARY(ClassicGenerator classic_generator.cpp)
+ADD_LIBRARY(Generator classic_generator.cpp)
 
-TARGET_LINK_LIBRARIES(ClassicGenerator tf HPlugin yaml-cpp)
+TARGET_LINK_LIBRARIES(Generator tf HPlugin yaml-cpp)
 
-INSTALL(TARGETS ClassicGenerator DESTINATION lib)
+INSTALL(TARGETS Generator DESTINATION lib)
 
 ############################ Start Simaple Generator ############################
 

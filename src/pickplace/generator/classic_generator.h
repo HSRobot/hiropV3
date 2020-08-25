@@ -11,7 +11,7 @@
 #include <yaml-cpp/yaml.h>
 
 #include "pickplace/igenerator.h"
-#include "pickplace/c_base_generator.h"
+// #include "pickplace/c_base_generator.h"
 #include "hpluginloader.h"
 
 
@@ -19,7 +19,7 @@
 
 using namespace hirop_pickplace;
 
-class ClassicGenerator:public CBaseGenerator{
+class Generator:public IGenerator{
 
 struct Sparameter{
     bool sorting;
@@ -50,12 +50,12 @@ public:
     /**
      * @brief 构造函数
      */
-    ClassicGenerator();
+    Generator();
 
     /**
      * @brief 析构函数
      */
-    ~ClassicGenerator();
+    ~Generator();
 
     /**
      * @brief 设置抓取位姿
@@ -107,6 +107,9 @@ public:
      * @return
      */
     int parseConfig(YAML::Node& );
+
+    ENTITY_TYPE getEntityType();
+    int getName(std::string &name);
 
 private:
 
@@ -185,11 +188,15 @@ private:
      */
     int quatConvect(Quaternion quat, int type, Quaternion &quatConvect);
 
+    int updateParam(std::string path);
+
 private: 
    Sparameter m_parm;
    PoseStamped m_pickpose;
    PoseStamped m_placepose;
    euler _pick_euler;
+   ENTITY_TYPE _entityType;
+   std::string _name;
 };
 
 H_DECLARE_PLUGIN(IGenerator)

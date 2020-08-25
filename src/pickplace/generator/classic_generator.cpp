@@ -1,16 +1,16 @@
 #include "classic_generator.h"
 
-ClassicGenerator::ClassicGenerator()
+Generator::Generator()
 {
 
 }
 
-ClassicGenerator::~ClassicGenerator()
+Generator::~Generator()
 {
 
 }
 
-int ClassicGenerator::parseConfig(YAML::Node& yamlNode)
+int Generator::parseConfig(YAML::Node& yamlNode)
 {
     YAML::Node node,followPostureNode,grabPostureNode,grabOffsetNode,placePostureNode,placeOffsetNode;
     if(!yamlNode["parameters"]){
@@ -68,19 +68,19 @@ int ClassicGenerator::parseConfig(YAML::Node& yamlNode)
     return 0;
 }
 
-int ClassicGenerator::setPickPose(PoseStamped pickObjPose)
+int Generator::setPickPose(PoseStamped pickObjPose)
 {
     m_pickpose = pickObjPose;
     return 0;
 }
 
-int ClassicGenerator::setPlacePose(PoseStamped placeObjPose)
+int Generator::setPlacePose(PoseStamped placeObjPose)
 {
     m_placepose = placeObjPose;
     return 0;
 }
 
-int ClassicGenerator::genPickPose()
+int Generator::genPickPose()
 {
     euler origin_euler;
     Quaternion quat_follow;
@@ -133,6 +133,7 @@ int ClassicGenerator::genPickPose()
               <<quat_follow.z<<" "
               <<quat_follow.w <<std::endl;
 
+    // TODO
     quatConvect(quat_follow, 1, quatCon);
 
 #ifdef _COUT_
@@ -174,7 +175,7 @@ int ClassicGenerator::genPickPose()
     return 0;
 }
 
-int ClassicGenerator::genPlacePose()
+int Generator::genPlacePose()
 {
     Quaternion place_quat,quat_origin;
 
@@ -201,19 +202,19 @@ int ClassicGenerator::genPlacePose()
     return 0;
 }
 
-int ClassicGenerator::getResultPickPose(PoseStamped &pickPoses)
+int Generator::getResultPickPose(PoseStamped &pickPoses)
 {
     pickPoses = m_pickpose;
     return 0;
 }
 
-int ClassicGenerator::getResultPlacePose(PoseStamped &placePoses)
+int Generator::getResultPlacePose(PoseStamped &placePoses)
 {
     placePoses = m_placepose;
     return 0;
 }
 
-int ClassicGenerator::quaternionToEuler(Quaternion quat,euler& euler)
+int Generator::quaternionToEuler(Quaternion quat,euler& euler)
 {
     tf::Quaternion quatt;
     quatt.setW(quat.w);
@@ -226,7 +227,7 @@ int ClassicGenerator::quaternionToEuler(Quaternion quat,euler& euler)
     return 0;
 }
 
-int ClassicGenerator::eulerToQuaternion(euler euler, Quaternion& quat)
+int Generator::eulerToQuaternion(euler euler, Quaternion& quat)
 {
 
     tf::Quaternion tq;
@@ -239,7 +240,7 @@ int ClassicGenerator::eulerToQuaternion(euler euler, Quaternion& quat)
     return 0;
 }
 
-int ClassicGenerator::quatPro(Quaternion quat1, Quaternion quat2, Quaternion &quat3)
+int Generator::quatPro(Quaternion quat1, Quaternion quat2, Quaternion &quat3)
 {
     float w1, x1, y1, z1;
     float w2, x2, y2, z2;
@@ -260,7 +261,7 @@ int ClassicGenerator::quatPro(Quaternion quat1, Quaternion quat2, Quaternion &qu
     return 0;
 }
 
-int ClassicGenerator::quatFromVector(double vec[4], Quaternion &quat)
+int Generator::quatFromVector(double vec[4], Quaternion &quat)
 {
     double vx = vec[0];
     double vy = vec[1];
@@ -281,7 +282,7 @@ int ClassicGenerator::quatFromVector(double vec[4], Quaternion &quat)
 
 }
 
-Quaternion ClassicGenerator::tfQuatRotation(double vx, double vy, double vz, double tan, Quaternion quatOrigin)
+Quaternion Generator::tfQuatRotation(double vx, double vy, double vz, double tan, Quaternion quatOrigin)
 {
     tf::Quaternion quat;
     Quaternion quatRet;
@@ -303,8 +304,8 @@ Quaternion ClassicGenerator::tfQuatRotation(double vx, double vy, double vz, dou
 
     return quatRet;
 }
-
-int ClassicGenerator::quatConvect(Quaternion quat, int type, Quaternion &quatConvect)
+// TODO
+int Generator::quatConvect(Quaternion quat, int type, Quaternion &quatConvect)
 {
     Quaternion quatConvectx, quatConvecty, quatConvectz;
 
@@ -351,7 +352,7 @@ int ClassicGenerator::quatConvect(Quaternion quat, int type, Quaternion &quatCon
     return 0;
 }
 
-Quaternion ClassicGenerator::setQuaternion(float qx, float qy, float qz, float qw)
+Quaternion Generator::setQuaternion(float qx, float qy, float qz, float qw)
 {
     Quaternion quat;
 
@@ -363,7 +364,7 @@ Quaternion ClassicGenerator::setQuaternion(float qx, float qy, float qz, float q
     return quat;
 }
 
-int ClassicGenerator::correctQuat(euler euler,Quaternion quat, Quaternion& quatCorrect)
+int Generator::correctQuat(euler euler,Quaternion quat, Quaternion& quatCorrect)
 {
     Quaternion quatPros;
     quatPros = quat;
@@ -395,7 +396,7 @@ int ClassicGenerator::correctQuat(euler euler,Quaternion quat, Quaternion& quatC
     return 0;
 }
 
-int ClassicGenerator::correctEuler(euler origin,euler& out_euler)
+int Generator::correctEuler(euler origin,euler& out_euler)
 {
 #ifdef _COUT_
     std::cout<<"origin.r =" <<origin.roll <<std::endl;
@@ -429,9 +430,28 @@ int ClassicGenerator::correctEuler(euler origin,euler& out_euler)
 #endif
 }
 
-int ClassicGenerator::stopGenerator()
+int Generator::stopGenerator()
 {
     return 0;
 }
 
-H_EXPORT_PLUGIN(ClassicGenerator,  "ClassicGenerator",  "1.0")
+int Generator::updateParam(std::string path)
+{
+    YAML::Node config;
+    config = YAML::LoadFile(path);
+    parseConfig(config);
+    return 0;
+}
+
+ENTITY_TYPE Generator::getEntityType()
+{
+    return this->_entityType;
+}
+
+int Generator::getName(std::string &name)
+{
+    name = this ->_name;
+    return 0;
+}
+
+H_EXPORT_PLUGIN(Generator,  "Generator",  "1.0")

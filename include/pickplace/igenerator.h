@@ -68,7 +68,10 @@ public:
 
     virtual ENTITY_TYPE getEntityType() = 0;
 
-     virtual ~IGenerator(){}
+    virtual int updateParam(std::string path) = 0;
+
+    virtual ~IGenerator(){}
+
 
 protected:
     // 保存识别器的字符描述
