@@ -1,0 +1,13 @@
+FIND_LIBRARY(hirop_perception_LIBRARY hirop_perception
+    PATHS @CMAKE_INSTALL_PREFIX@/lib
+    NO_DEFAULT_PATH
+)
+
+SET(hirop_perception_LIBRARIES ${hirop_perception_LIBRARY})
+
+FIND_PATH(hirop_perception_INCLUDE_DIR hirop_perception
+    PATHS @CMAKE_INSTALL_PREFIX@/include/hirop
+    NO_DEFAULT_PATH
+)
+
+SET(hirop_perception_INCLUDE_DIRS ${hirop_perception_INCLUDE_DIR})
