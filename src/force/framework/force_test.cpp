@@ -2,8 +2,6 @@
 #include <iostream>
 //#include <hirop/force/forcePluginAggre.h>
 using namespace std;
-//using namespace hirop_vision;
-//using namespace cv;
 
 int emain(int args, char** argv){
 
@@ -15,7 +13,6 @@ int emain(int args, char** argv){
 //    plugin.setInputForceBias(force);
 //    vector<double> pose{0,-1.57,3.14,0,1.57,0};
 //    plugin.setInputRobotPose(pose);
-
 //    for(;;)
 //    {
 //        plugin.compute();
