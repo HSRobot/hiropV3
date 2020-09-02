@@ -864,7 +864,8 @@ void Actuator::setMoveGroup()
     loadMoveit();
     adjusterPtr = new adjuster();
     adjusterPtr->setMoveGroupName(MOVE_GROUP);
-    gripperPub = node.advertise<std_msgs::Bool>(MOVE_GROUP + "/gripper_state", 10);
+    // gripperPub = node.advertise<std_msgs::Bool>(MOVE_GROUP + "/gripper_state", 10);
+    gripperClinet = node.serviceClient<std_srvs::SetBool>(MOVE_GROUP + "/gripper_state");
 }
 
 
@@ -985,10 +986,21 @@ ENTITY_TYPE Actuator::getEntityType()
 
 bool Actuator::gripperController(bool open)
 {
-    // ros::Publisher gripperPub = node.advertise<std_msgs::Bool>(MOVE_GROUP + "/gripper_state", 10);
-    std_msgs::Bool msg;
-    msg.data = open;
-    gripperPub.publish(msg);
+    // std_msgs::Bool msg;
+    // msg.data = open;
+    // gripperPub.publish(msg);
+    // ros::Duration(1).sleep();
+    std_srvs::SetBool srv;
+    srv.request.data = open;
+    try
+    {
+        gripperClinet.call(srv);
+    }
+    catch(const std::exception& e)
+    {
+
+    }
+    
     return true;
 }
 

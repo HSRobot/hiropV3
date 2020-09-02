@@ -31,6 +31,7 @@
 #include <moveit_msgs/PlaceActionResult.h>
 #include "pickplace/ipickplace.h"
 #include "std_msgs/Bool.h"
+#include "std_srvs/SetBool.h"
 /****/
 
 #define OBJECT_ID "object"
@@ -313,6 +314,7 @@ private:
     ros::Subscriber pickTraSub;
     ros::Subscriber placeTraSub;
     ros::Publisher gripperPub;
+    ros::ServiceClient gripperClinet;
     ros::NodeHandle node;
 
     std::string _name;
