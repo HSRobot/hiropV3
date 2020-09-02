@@ -95,6 +95,7 @@ private:
 
     void transformVecStr2Array(int *arr, int size, vector<string> &data);
 
+    void resetVecAndAcc();
 private:
     YAML::Node  node;
     string pluginName;

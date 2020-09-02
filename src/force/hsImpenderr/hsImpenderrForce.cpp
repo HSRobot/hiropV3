@@ -75,7 +75,9 @@ int hsImpenderrForce::parseConfig(YAML::Node &node)
 void hsImpenderrForce::setInputForceBias(std::vector<double> &value)
 {
     assert(value.size() == 6);
-    Force.swap(value);
+    Force.clear();
+    Force.resize(6);
+    copy(value.begin(), value.begin()+ 6, Force.begin());
 }
 
 void hsImpenderrForce::setInputRobotCartPose(std::vector<double> &value)
@@ -154,6 +156,8 @@ int hsImpenderrForce::setDirection(int *direction)
 }
 
 int hsImpenderrForce::setParameters(double* _Stiffness,double* _Damping,double* _Mass) {
+
+    resetVecAndAcc();
     for(int i= 0; i< 6; i++)
     {
         this->m_Stiffness[i] = *_Stiffness;
@@ -196,6 +200,14 @@ void hsImpenderrForce::transformVecStr2Array(int *arr, int size, vector<string> 
     {
         arr[i] = std::atoi(data.at(i).c_str());
     }
+}
+
+void hsImpenderrForce::resetVecAndAcc()
+{
+    std::fill(&dXa_1[0],&dXa_1[6], 0);
+    std::fill(&Xa_1[0],&Xa_1[6], 0);
+    std::fill(&ddXa[0],&ddXa[6], 0);
+    std::fill(&Xa[0],&Xa[6], 0);
 }
 
 int hsImpenderrForce::printInfo()
